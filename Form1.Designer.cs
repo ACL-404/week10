@@ -33,6 +33,10 @@
             this.textwindow01 = new System.Windows.Forms.RichTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.addnew = new System.Windows.Forms.Button();
+            this.list = new System.Windows.Forms.ListBox();
+            this.lastbt = new System.Windows.Forms.Button();
+            this.nestbt = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // open
@@ -62,20 +66,68 @@
             this.textwindow01.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.textwindow01.Location = new System.Drawing.Point(26, 107);
             this.textwindow01.Name = "textwindow01";
-            this.textwindow01.Size = new System.Drawing.Size(467, 320);
+            this.textwindow01.Size = new System.Drawing.Size(345, 320);
             this.textwindow01.TabIndex = 2;
             this.textwindow01.Text = "";
+            this.textwindow01.TextChanged += new System.EventHandler(this.textwindow01_TextChanged);
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // addnew
+            // 
+            this.addnew.BackColor = System.Drawing.SystemColors.Info;
+            this.addnew.Location = new System.Drawing.Point(260, 38);
+            this.addnew.Name = "addnew";
+            this.addnew.Size = new System.Drawing.Size(111, 63);
+            this.addnew.TabIndex = 3;
+            this.addnew.Text = "新增";
+            this.addnew.UseVisualStyleBackColor = false;
+            this.addnew.Click += new System.EventHandler(this.addnew_Click);
+            // 
+            // list
+            // 
+            this.list.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.list.FormattingEnabled = true;
+            this.list.ItemHeight = 15;
+            this.list.Location = new System.Drawing.Point(377, 107);
+            this.list.Name = "list";
+            this.list.Size = new System.Drawing.Size(228, 319);
+            this.list.TabIndex = 6;
+            // 
+            // lastbt
+            // 
+            this.lastbt.BackColor = System.Drawing.SystemColors.Info;
+            this.lastbt.Location = new System.Drawing.Point(377, 38);
+            this.lastbt.Name = "lastbt";
+            this.lastbt.Size = new System.Drawing.Size(111, 63);
+            this.lastbt.TabIndex = 7;
+            this.lastbt.Text = "上一步";
+            this.lastbt.UseVisualStyleBackColor = false;
+            this.lastbt.Click += new System.EventHandler(this.lastbt_Click);
+            // 
+            // nestbt
+            // 
+            this.nestbt.BackColor = System.Drawing.SystemColors.Info;
+            this.nestbt.Location = new System.Drawing.Point(494, 38);
+            this.nestbt.Name = "nestbt";
+            this.nestbt.Size = new System.Drawing.Size(111, 63);
+            this.nestbt.TabIndex = 8;
+            this.nestbt.Text = "下一步";
+            this.nestbt.UseVisualStyleBackColor = false;
+            this.nestbt.Click += new System.EventHandler(this.nestbt_Click);
             // 
             // window1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Info;
-            this.ClientSize = new System.Drawing.Size(711, 439);
+            this.ClientSize = new System.Drawing.Size(630, 439);
+            this.Controls.Add(this.nestbt);
+            this.Controls.Add(this.lastbt);
+            this.Controls.Add(this.list);
+            this.Controls.Add(this.addnew);
             this.Controls.Add(this.textwindow01);
             this.Controls.Add(this.save);
             this.Controls.Add(this.open);
@@ -92,6 +144,10 @@
         private System.Windows.Forms.RichTextBox textwindow01;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Button addnew;
+        private System.Windows.Forms.ListBox list;
+        private System.Windows.Forms.Button lastbt;
+        private System.Windows.Forms.Button nestbt;
     }
 }
 

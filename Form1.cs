@@ -12,13 +12,17 @@ using System.IO;    // 使用 IO 函式庫
 
 namespace week10
 {
-    public partial class window1: Form
+    public partial class window1 : Form
     {
         public window1()
         {
             InitializeComponent();
         }
 
+        private bool isUndoRedo = false;
+        private Stack<string> undoStack = new Stack<string>();
+        private Stack<string> redoStack = new Stack<string>();
+        private const int MaxHistoryCount = 10; // 最多紀錄10個紀錄
         private void open_Click(object sender, EventArgs e)
         {
             // 設置對話方塊標題
@@ -61,7 +65,7 @@ namespace week10
                         using (StreamReader streamReader = new StreamReader(fileStream, Encoding.UTF8))
                         {
                             // 將檔案內容顯示到 RichTextBox 中
-                           textwindow01.Text = streamReader.ReadToEnd();
+                            textwindow01.Text = streamReader.ReadToEnd();
                         }
                     }
 
@@ -139,6 +143,97 @@ namespace week10
             else
             {
                 MessageBox.Show("使用者取消了儲存檔案操作。", "訊息", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            }
+        }
+
+        private void addnew_Click(object sender, EventArgs e)
+        {
+            // 提示使用者是否要儲存當前檔案的變更
+            if (!string.IsNullOrEmpty(textwindow01.Text))
+            {
+                DialogResult result = MessageBox.Show("是否要儲存當前檔案的變更？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    // 呼叫 save_Click 方法儲存檔案
+                    save_Click(sender, e);
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    // 如果使用者選擇取消，則不執行任何操作
+                    return;
+                }
+            }
+
+            // 清空 TextBox 的內容，模擬新增檔案
+            textwindow01.Clear();
+
+            // 更新表單的標題，提示使用者目前是未命名檔案
+            this.Text = "未命名檔案 - 文書編輯器";
+        }
+
+        private void textwindow01_TextChanged(object sender, EventArgs e)
+        {
+            // 只有當isUndo這個變數是false的時候，才能堆疊文字編輯紀錄
+            if (isUndoRedo == false)
+            {
+                undoStack.Push(textwindow01.Text); // 將當前的文本內容加入堆疊
+                redoStack.Clear();            // 清空重作堆疊
+
+                // 確保堆疊中只保留最多10個紀錄
+                if (undoStack.Count > MaxHistoryCount)
+                {
+                    // 用一個臨時堆疊，將除了最下面一筆的文字記錄之外，將文字紀錄堆疊由上而下，逐一移除再堆疊到臨時堆疊之中
+                    Stack<string> tempStack = new Stack<string>();
+                    for (int i = 0; i < MaxHistoryCount; i++)
+                    {
+                        tempStack.Push(undoStack.Pop());
+                    }
+                    undoStack.Clear(); // 清空堆疊
+                                       // 文字編輯堆疊紀錄清空之後，再將暫存堆疊（tempStack）中的資料，逐一放回到文字編輯堆疊紀錄
+                    foreach (string item in tempStack)
+                    {
+                        undoStack.Push(item);
+                    }
+                }
+                UpdateListBox(); // 更新 ListBox
+            }
+        }
+        private void lastbt_Click(object sender, EventArgs e)
+        {
+            if (undoStack.Count > 1)
+            {
+                isUndoRedo = true;
+                redoStack.Push(undoStack.Pop()); // 將回復堆疊最上面的紀錄移出，再堆到重作堆疊
+                textwindow01.Text = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                UpdateListBox();
+                isUndoRedo = false;
+            }
+        }
+
+
+        private void UpdateListBox()
+        {
+            {
+                list.Items.Clear(); // 清空 ListBox 中的元素
+
+                // 將堆疊中的內容逐一添加到 ListBox 中
+                foreach (string item in undoStack)
+                {
+                    list.Items.Add(item);
+                }
+            }
+        }
+
+        private void nestbt_Click(object sender, EventArgs e)
+        {
+            if (redoStack.Count > 0)
+            {
+                isUndoRedo = true;
+                undoStack.Push(redoStack.Pop()); // 將重作堆疊最上面的紀錄移出，再堆到回復堆疊
+                textwindow01.Text = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                UpdateListBox();
+                isUndoRedo = false;
             }
         }
     }
