@@ -146,32 +146,7 @@ namespace week10
             }
         }
 
-        private void addnew_Click(object sender, EventArgs e)
-        {
-            // 提示使用者是否要儲存當前檔案的變更
-            if (!string.IsNullOrEmpty(textwindow01.Text))
-            {
-                DialogResult result = MessageBox.Show("是否要儲存當前檔案的變更？", "提示", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                {
-                    // 呼叫 save_Click 方法儲存檔案
-                    save_Click(sender, e);
-                }
-                else if (result == DialogResult.Cancel)
-                {
-                    // 如果使用者選擇取消，則不執行任何操作
-                    return;
-                }
-            }
-
-            // 清空 TextBox 的內容，模擬新增檔案
-            textwindow01.Clear();
-
-            // 更新表單的標題，提示使用者目前是未命名檔案
-            this.Text = "未命名檔案 - 文書編輯器";
-        }
-
+        
         private void textwindow01_TextChanged(object sender, EventArgs e)
         {
             // 只有當isUndo這個變數是false的時候，才能堆疊文字編輯紀錄
