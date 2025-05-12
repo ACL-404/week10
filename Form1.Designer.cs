@@ -111,31 +111,36 @@
             // 
             // comboBoxSize
             // 
+            this.comboBoxSize.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.comboBoxSize.FormattingEnabled = true;
-            this.comboBoxSize.Location = new System.Drawing.Point(143, 12);
+            this.comboBoxSize.Location = new System.Drawing.Point(143, 7);
             this.comboBoxSize.Name = "comboBoxSize";
-            this.comboBoxSize.Size = new System.Drawing.Size(111, 23);
+            this.comboBoxSize.Size = new System.Drawing.Size(111, 28);
             this.comboBoxSize.TabIndex = 10;
             this.comboBoxSize.Text = "字體大小";
+            this.comboBoxSize.SelectedIndexChanged += new System.EventHandler(this.comboBoxStyle_SelectedIndexChanged);
             // 
             // comboBoxStyle
             // 
+            this.comboBoxStyle.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.comboBoxStyle.FormattingEnabled = true;
-            this.comboBoxStyle.Location = new System.Drawing.Point(260, 12);
+            this.comboBoxStyle.Location = new System.Drawing.Point(260, 7);
             this.comboBoxStyle.Name = "comboBoxStyle";
-            this.comboBoxStyle.Size = new System.Drawing.Size(111, 23);
+            this.comboBoxStyle.Size = new System.Drawing.Size(111, 28);
             this.comboBoxStyle.TabIndex = 11;
             this.comboBoxStyle.Text = "字體樣式";
             this.comboBoxStyle.SelectedIndexChanged += new System.EventHandler(this.comboBoxStyle_SelectedIndexChanged);
             // 
             // comboBoxFont
             // 
+            this.comboBoxFont.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.comboBoxFont.FormattingEnabled = true;
-            this.comboBoxFont.Location = new System.Drawing.Point(26, 12);
+            this.comboBoxFont.Location = new System.Drawing.Point(26, 7);
             this.comboBoxFont.Name = "comboBoxFont";
-            this.comboBoxFont.Size = new System.Drawing.Size(111, 23);
+            this.comboBoxFont.Size = new System.Drawing.Size(111, 28);
             this.comboBoxFont.TabIndex = 12;
             this.comboBoxFont.Text = "字型選單";
+            this.comboBoxFont.SelectedIndexChanged += new System.EventHandler(this.comboBoxStyle_SelectedIndexChanged);
             // 
             // window1
             // 
