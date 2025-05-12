@@ -23,11 +23,28 @@ namespace week10
         }
 
         private bool isUndoRedo = false;
-        private Stack<string> undoStack = new Stack<string>();
-        private Stack<string> redoStack = new Stack<string>();
+        private Stack<MemoryStream> undoStack = new Stack<MemoryStream>(); // 回復堆疊
+        private Stack<MemoryStream> redoStack = new Stack<MemoryStream>(); // 重作堆疊
         private const int MaxHistoryCount = 10; // 最多紀錄10個紀錄
         private int selectionStart = 0;         // 記錄文字反白的起點
         private int selectionLength = 0;        // 記錄文字反白的長度
+                                                // 將文字編輯狀態保存到回復堆疊
+        private void SaveCurrentStateToStack()
+        {
+            // 創建一個新的 MemoryStream 來保存文字編輯狀態
+            MemoryStream memoryStream = new MemoryStream();
+            // 將 RichTextBox 的內容保存到 memoryStream
+            textwindow01.SaveFile(memoryStream, RichTextBoxStreamType.RichText);
+            // 將 memoryStream 放入回復堆疊
+            undoStack.Push(memoryStream);
+        }
+        private void LoadFromMemory(MemoryStream memoryStream)
+        {
+            // 將 memoryStream 的指標重置到開始位置
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            // 將 memoryStream 的內容放到到 RichTextBox
+            textwindow01.LoadFile(memoryStream, RichTextBoxStreamType.RichText);
+        }
         private void open_Click(object sender, EventArgs e)
         {
             // 設置對話方塊標題
@@ -89,8 +106,7 @@ namespace week10
 }
 
         private void save_Click(object sender, EventArgs e)
-        {
-            // 設置對話方塊標題
+        { // 設置對話方塊標題
             saveFileDialog1.Title = "儲存檔案";
             // 設置對話方塊篩選器，限制使用者只能選擇特定類型的檔案
             saveFileDialog1.Filter = "RTF格式檔案 (*.rtf)|*.rtf|文字檔案 (*.txt)|*.txt|所有檔案 (*.*)|*.*";
@@ -126,7 +142,7 @@ namespace week10
                         else if (extension.ToLower() == ".rtf")
                         {
                             // 將RichTextBox中的內容保存為RTF格式
-                            textwindow01.SaveFile(fileStream, RichTextBoxStreamType.RichText);
+                           textwindow01.SaveFile(fileStream, RichTextBoxStreamType.RichText);
                         }
                     }
 
@@ -148,27 +164,26 @@ namespace week10
                 MessageBox.Show("使用者取消了儲存檔案操作。", "訊息", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             }
         }
-
         private void textwindow01_TextChanged(object sender, EventArgs e)
         {
             // 只有當isUndo這個變數是false的時候，才能堆疊文字編輯紀錄
             if (isUndoRedo == false)
             {
-                undoStack.Push(textwindow01.Text); // 將當前的文本內容加入堆疊
+                SaveCurrentStateToStack(); // 將當前的文本內容加入堆疊
                 redoStack.Clear();            // 清空重作堆疊
 
                 // 確保堆疊中只保留最多10個紀錄
                 if (undoStack.Count > MaxHistoryCount)
                 {
                     // 用一個臨時堆疊，將除了最下面一筆的文字記錄之外，將文字紀錄堆疊由上而下，逐一移除再堆疊到臨時堆疊之中
-                    Stack<string> tempStack = new Stack<string>();
+                    Stack<MemoryStream> tempStack = new Stack<MemoryStream>();
                     for (int i = 0; i < MaxHistoryCount; i++)
                     {
                         tempStack.Push(undoStack.Pop());
                     }
                     undoStack.Clear(); // 清空堆疊
                                        // 文字編輯堆疊紀錄清空之後，再將暫存堆疊（tempStack）中的資料，逐一放回到文字編輯堆疊紀錄
-                    foreach (string item in tempStack)
+                    foreach (MemoryStream item in tempStack)
                     {
                         undoStack.Push(item);
                     }
@@ -176,29 +191,29 @@ namespace week10
                 UpdateListBox(); // 更新 ListBox
             }
         }
+
+        // 更新 ListBox
+        void UpdateListBox()
+        {
+            list.Items.Clear(); // 清空 ListBox 中的元素
+
+            // 將堆疊中的內容逐一添加到 ListBox 中
+            foreach (MemoryStream item in undoStack)
+            {
+                list.Items.Add(item);
+            }
+        }
+
         private void lastbt_Click(object sender, EventArgs e)
         {
             if (undoStack.Count > 1)
             {
                 isUndoRedo = true;
                 redoStack.Push(undoStack.Pop()); // 將回復堆疊最上面的紀錄移出，再堆到重作堆疊
-                textwindow01.Text = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                MemoryStream lastSavedState = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                LoadFromMemory(lastSavedState);
                 UpdateListBox();
                 isUndoRedo = false;
-            }
-        }
-
-
-        private void UpdateListBox()
-        {
-            {
-                list.Items.Clear(); // 清空 ListBox 中的元素
-
-                // 將堆疊中的內容逐一添加到 ListBox 中
-                foreach (string item in undoStack)
-                {
-                    list.Items.Add(item);
-                }
             }
         }
 
@@ -208,7 +223,8 @@ namespace week10
             {
                 isUndoRedo = true;
                 undoStack.Push(redoStack.Pop()); // 將重作堆疊最上面的紀錄移出，再堆到回復堆疊
-                textwindow01.Text = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                MemoryStream lastSavedState = undoStack.Peek(); // 將回復堆疊最上面一筆紀錄顯示
+                LoadFromMemory(lastSavedState);
                 UpdateListBox();
                 isUndoRedo = false;
             }
@@ -228,14 +244,13 @@ namespace week10
         private void InitializeFontSizeComboBox()
         {
             // 從8開始，每次增加2，直到72，將這些數值添加到字體大小選擇框中
-            for (int i = 4; i <= 72; i += 4)
+            for (int i = 8; i <= 72; i += 2)
             {
                 comboBoxSize.Items.Add(i);
             }
             // 設置預設選中的項目為第三個大小，即12字體大小
             comboBoxSize.SelectedIndex = 2;
         }
-
         // 初始化字體樣式下拉選單
         private void InitializeFontStyleComboBox()
         {
@@ -245,14 +260,19 @@ namespace week10
             comboBoxStyle.Items.Add(FontStyle.Italic.ToString());    // 斜體
             comboBoxStyle.Items.Add(FontStyle.Underline.ToString()); // 底線
             comboBoxStyle.Items.Add(FontStyle.Strikeout.ToString()); // 刪除線
-            // 設置預設選中的項目為第一個樣式，即正常字體
+                                                                     // 設置預設選中的項目為第一個樣式，即正常字體
             comboBoxStyle.SelectedIndex = 0;
         }
+
 
         private void comboBoxStyle_SelectedIndexChanged(object sender, EventArgs e)
         {
             {
-                // 檢查當前選擇的文字是否有字型，如果有，則進行後續處理
+                // 保存當前選擇的文字起始位置和長度
+                selectionStart = textwindow01.SelectionStart;
+                selectionLength = textwindow01.SelectionLength;
+
+                // 確保當前選擇的文字具有字型
                 if (textwindow01.SelectionFont != null)
                 {
                     // 從下拉選單中獲取選擇的字型、大小和樣式
@@ -289,7 +309,13 @@ namespace week10
                         textwindow01.SelectionFont = newFont;
                     }
                 }
+
+                // 恢復選擇狀態
+                textwindow01.Focus();
+                textwindow01.Select(selectionStart, selectionLength);
+
             }
         }
+
     }
 }
